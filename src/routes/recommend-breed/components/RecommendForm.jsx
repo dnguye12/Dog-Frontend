@@ -1,10 +1,8 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn } from "../../../../lib/utils";
 
-const RecommendForm = ({ handleSubmit, stats, userInput, setUserInput, startOver }) => {
-    const [question, setQuestion] = useState(1)
+const RecommendForm = ({ handleSubmit, question, setQuestion, stats, userInput, setUserInput, startOver }) => {
 
     if (!stats || !userInput) {
         return (
@@ -454,7 +452,7 @@ const RecommendForm = ({ handleSubmit, stats, userInput, setUserInput, startOver
                     <label className="form-control w-full">
                         <div className="label justify-center flex-col">
                             <span className="label-text text-3xl font-bold text-accent">What is your budget for your new dog?</span>
-                            <p className=" italic mt-1">This slider shows the range of the lifetime cost for all the doggos.</p>
+                            <p className=" italic mt-1"></p>
                         </div>
                         <div className="flex items-start flex-wrap justify-center gap-x-8 my-8">
                             <div className="flex flex-col justify-center">
@@ -627,7 +625,7 @@ const RecommendForm = ({ handleSubmit, stats, userInput, setUserInput, startOver
                 question === 6 && (
                     <label className="form-control w-full">
                         <div className="label justify-center flex-col">
-                            <span className="label-text text-3xl font-bold text-accent">How much time can you dedicate to your new dog's grooming?</span>
+                            <span className="label-text text-3xl font-bold text-accent">How much time can you dedicate to your new dog&apos;s grooming?</span>
                             <p className=" italic mt-1"></p>
                         </div>
                         <div className="flex items-start flex-wrap justify-center gap-x-8 my-8">
@@ -761,7 +759,12 @@ const RecommendForm = ({ handleSubmit, stats, userInput, setUserInput, startOver
                     onClick={startOver}
                     className="btn btn-wide btn-error shadow-md"
                 ><FontAwesomeIcon icon="fa-solid fa-rotate" />Start Over</button>
-                <button type="submit" className="btn btn-accent btn-wide mt-4 shadow-md">Submit</button>
+                <button type="submit" className=
+                    {cn(
+                        "btn btn-accent btn-wide mt-4 shadow-md",
+                        question !== 6 && "btn-disabled"
+                    )}
+                >Submit</button>
             </div>
 
         </form>

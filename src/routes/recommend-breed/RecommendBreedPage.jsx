@@ -7,31 +7,29 @@ import Footer from "../../components/Footer";
 import RecommendCard from "./components/RecommendCard";
 import RecommendForm from "./components/RecommendForm";
 import { useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useUser } from "@clerk/clerk-react";
 
 const RecommendBreedPage = () => {
+    const { isSignedIn, user } = useUser()
+
     const [userInput, setUserInput] = useState({
-        popularity_ranking: 0,
-        size: 1,
-        lifetime_cost: 0,
-        intelligence: 5,
-        longevity: 0,
-        grooming_frequency: 2,
+        popularity_ranking: -1,
+        size: -1,
+        lifetime_cost: -1,
+        intelligence: -1,
+        grooming_frequency: -1,
         suitability_for_children: -1
     })
     const [stats, setStats] = useState(null)
     const [recs, setRecs] = useState([])
+    const [question, setQuestion] = useState(1)
 
     useEffect(() => {
         const initStats = async () => {
             try {
                 const res = await getStats()
                 setStats(res)
-                setUserInput({
-                    ...userInput,
-                    lifetime_cost: res.lowest_lifetime_cost,
-                    longevity: res.lowest_longevity,
-                    popularity_ranking: res.lowest_popularity
-                })
             } catch (error) {
                 console.error("Error fetching stats:", error);
             }
@@ -44,27 +42,25 @@ const RecommendBreedPage = () => {
 
     const startOver = () => {
         setUserInput({
-            popularity_ranking: stats.lowest_popularity,
-            size: 1,
-            lifetime_cost: stats.lowest_lifetime_cos,
-            intelligence: 5,
-            longevity: stats.lowest_lifetime_cos,
-            grooming_frequency: 2,
+            popularity_ranking: -1,
+            size: -1,
+            lifetime_cost: -1,
+            intelligence: -1,
+            grooming_frequency: -1,
             suitability_for_children: -1
         })
+        setStats(null)
+        setQuestion(1)
+        setRecs([])
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await getPrediction(userInput)
+            let res = await getPrediction({ ...userInput, userId: user?.id })
             if (res) {
 
-                res.sort((a, b) => b.prediction - a.prediction)
-
-                let topThree = res.slice(0, 3);
-
-                const missingImages = topThree.filter(dog => !dog.image)
+                const missingImages = res.filter(dog => !dog.image)
 
                 if (missingImages.length > 0) {
                     const fetchImage = async (id) => {
@@ -77,19 +73,18 @@ const RecommendBreedPage = () => {
                         }
                     }
 
-                    const updatedDogs = await Promise.all(topThree.map(async (item) => {
+                    const updatedDogs = await Promise.all(res.map(async (item) => {
                         if (!item.image) {
                             const helper = await fetchImage(item._id)
-                            return helper
+                            return { ...helper, prediction: item.prediction }
                         }
                         return item
                     }))
 
-                    topThree = updatedDogs
+                    res = updatedDogs
                 }
 
-
-                setRecs(topThree)
+                setRecs(res)
             }
         } catch (error) {
             console.log(error)
@@ -99,11 +94,13 @@ const RecommendBreedPage = () => {
     return (
         <div className="flex flex-col min-h-screen">
             <Navbar />
-            <main className=" bg-base-200 flex-1">
-                <div className="container px-10 xl:px-0 max-w-6xl mx-auto py-16">
+            <main className=" bg-base-200 flex-1 flex justify-center py-10">
+                <div className="container px-10 xl:px-0 max-w-6xl mx-auto">
                     {recs.length === 0 && (
                         <RecommendForm
                             handleSubmit={handleSubmit}
+                            question={question}
+                            setQuestion={setQuestion}
                             stats={stats}
                             userInput={userInput}
                             setUserInput={setUserInput}
@@ -113,15 +110,39 @@ const RecommendBreedPage = () => {
 
                     {recs.length > 0 &&
                         (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {
-                                    recs.map((rec, idx) => (
-                                        <RecommendCard
-                                            key={`rec ${idx}`}
-                                            breed={rec}
-                                        />
-                                    ))
-                                }
+                            <div className="w-full">
+                                <div className="label justify-center flex-col">
+                                    <span className="label-text text-3xl font-bold text-accent">Your dog breed selector results</span>
+                                    {
+                                        isSignedIn
+                                            ?
+                                            <p className=" italic mt-1">You can rate if a recommendation is good or bad.</p>
+                                            :
+                                            <p className=" italic mt-1">You can <span className="text-lg font-bold uppercase">login</span> to rate these recommendations.</p>
+                                    }
+
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 my-6">
+                                    {
+                                        recs.map((rec, idx) => (
+                                            <RecommendCard
+                                                key={`rec ${idx}`}
+                                                breed={rec}
+                                                stats={stats}
+                                                userInput={userInput}
+                                                isSignedIn={isSignedIn}
+                                                user={user}
+                                            />
+                                        ))
+                                    }
+                                </div>
+                                <div className="flex flex-col justify-center items-center">
+                                    <button
+                                        type="button"
+                                        onClick={startOver}
+                                        className="btn btn-wide btn-error shadow-md"
+                                    ><FontAwesomeIcon icon="fa-solid fa-rotate" />Start Over</button>
+                                </div>
                             </div>
                         )
                     }
