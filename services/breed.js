@@ -25,3 +25,15 @@ export const getStats = async () => {
         return null
     }
 }
+
+export const getSimilarName = async (name) => {
+    let query = baseUrl + `/api/breed/similar-name?name=${name}`
+
+    try {
+        const request = await axios.get(query)
+        return request.data
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}

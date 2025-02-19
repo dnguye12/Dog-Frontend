@@ -304,7 +304,7 @@ const RecommendCard = ({ breed, stats, userInput, isSignedIn, user }) => {
                                             <td>{breed.grooming_frequency}</td>
                                         </tr>
                                         <tr className="hover">
-                                            <th>8</th>
+                                            <th>9</th>
                                             <td>Potential Health Issues</td>
                                             <td>{breed.genetic_ailments}</td>
                                         </tr>
