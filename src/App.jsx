@@ -15,6 +15,7 @@ import SignInPage from "./routes/sign-in/SignInPage";
 import SignUpPage from "./routes/sign-up/SignUpPage";
 import { getUser, postUser } from "../services/user";
 import AddBreedPage from "./routes/add-breed/AddBreedPage";
+import ProfilePage from "./routes/profile/ProfilePage";
 
 const RequireAuth = ({ children }) => {
   const { isSignedIn, user, isLoaded } = useUser()
@@ -66,6 +67,11 @@ function App() {
       <Route path="/add-breed/*" element={
         <RequireAuth>
           <AddBreedPage />
+        </RequireAuth>
+      } />
+      <Route path="/profile/*" element={
+        <RequireAuth>
+          <ProfilePage />
         </RequireAuth>
       } />
     </Routes>

@@ -7,7 +7,7 @@ export const getUser = async(userId) => {
 
     try {
         const request = await axios.get(query)
-        return request
+        return request.data
     } catch (error) {
         console.log(error)
         return null

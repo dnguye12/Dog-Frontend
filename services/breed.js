@@ -37,3 +37,15 @@ export const getSimilarName = async (name) => {
         return null
     }
 }
+
+export const getBreedsSize = async() => {
+    let query = baseUrl + `/api/breed/size`
+
+    try {
+        const request = await axios.get(query)
+        return request.data
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
