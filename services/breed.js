@@ -14,6 +14,18 @@ export const getBreed = async (id) => {
     }
 }
 
+export const getAll = async () => {
+    let query = `${baseUrl}/api/breed/all`
+
+    try {
+        const request = await axios.get(query)
+        return request.data
+    } catch (error) {
+        console.log(error)
+        return null
+    }
+}
+
 export const getStats = async () => {
     let query = `${baseUrl}/api/breed/stats`
 
@@ -38,7 +50,7 @@ export const getSimilarName = async (name) => {
     }
 }
 
-export const getBreedsSize = async() => {
+export const getBreedsSize = async () => {
     let query = baseUrl + `/api/breed/size`
 
     try {
